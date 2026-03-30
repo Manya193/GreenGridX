@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Energy Marketplace</title>
+
+<style>
+body {
+  margin: 0;
+  font-family: 'Segoe UI', sans-serif;
+  background: #f4f7f6;
+}
+
+/* HEADER */
+.header {
+  background: #0d6b5c;
+  color: white;
+  padding: 15px 30px;
+  font-size: 20px;
+  font-weight: 600;
+}
+
+/* MAIN */
+.container {
+  padding: 30px;
+}
+
+/* GRID */
+.cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 20px;
+}
+
+/* CARD */
+.card {
+  background: white;
+  padding: 15px;
+  border-radius: 10px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+  transition: 0.2s ease;
+}
+
+.card:hover {
+  transform: translateY(-3px);
+}
+
+/* ENERGY */
+.energy {
+  font-size: 18px;
+  font-weight: bold;
+  color: #0d6b5c;
+  margin-bottom: 5px;
+}
+
+/* PRICE */
+.price {
+  font-size: 15px;
+  margin-bottom: 10px;
+}
+
+/* META */
+.meta {
+  font-size: 13px;
+  color: #555;
+  margin-bottom: 10px;
+}
+
+/* BADGE */
+.badge {
+  display: inline-block;
+  padding: 4px 10px;
+  font-size: 12px;
+  border-radius: 20px;
+  color: white;
+  margin-bottom: 10px;
+}
+
+/* TIME COLORS */
+.morning {
+  background: #4CAF50;
+}
+
+.afternoon {
+  background: #FFC107;
+  color: black;
+}
+
+.evening {
+  background: #2196F3;
+}
+
+/* BUTTON */
+.buy-btn {
+  display: block;
+  text-align: center;
+  margin-top: 10px;
+  padding: 8px;
+  background: #0d6b5c;
+  color: white;
+  text-decoration: none;
+  border-radius: 8px;
+  font-size: 13px;
+  transition: 0.2s ease;
+}
+
+.buy-btn:hover {
+  background: #095c4e;
+}
+
+/* EMPTY */
+.empty {
+  text-align: center;
+  margin-top: 50px;
+  color: #777;
+  font-size: 16px;
+}
+</style>
+</head>
+
+<body>
+
+<div class="header">⚡ Energy Marketplace</div>
+
+<div class="container">
+
+  <% if (energies.length === 0) { %>
+
+    <p class="empty">No energy listings available ⚡</p>
+
+  <% } else { %>
+
+    <div class="cards">
+
+      <% energies.forEach(energy => { %>
+
+        <div class="card">
+
+          <div class="energy">⚡ <%= energy.energyAmount %> kWh</div>
+
+          <div class="price">₹ <%= energy.price %> / kWh</div>
+
+          <div class="meta">📍 <%= energy.location %></div>
+
+          <span class="badge <%= energy.time %>">
+            <%= energy.time %>
+          </span>
+
+          <a href="/buy/<%= energy._id %>" class="buy-btn">
+            Buy Energy ⚡
+          </a>
+
+        </div>
+
+      <% }) %>
+
+    </div>
+
+  <% } %>
+
+</div>
+
+</body>
+</html>

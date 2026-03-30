@@ -1,0 +1,760 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Buyer Dashboard</title>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<style>
+body {
+  margin: 0;
+  font-family: 'Segoe UI', sans-serif;
+  display: flex;
+  background: #f4f7f6;
+}
+
+/* SIDEBAR */
+.sidebar {
+  width: 260px;
+  height: 100vh;
+  background: #0f3d4c;
+  color: white;
+  padding: 20px;
+  position: fixed;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  box-sizing: border-box;
+}
+
+.sidebar-top a {
+  display: block;
+  color: #cfe8e5;
+  text-decoration: none;
+  margin: 12px 0;
+  padding-bottom: 10px;
+}
+
+.sidebar-top a:hover {
+  color: white;
+}
+
+/* LOGOUT */
+.logout-box {
+  background: rgba(255,255,255,0.1);
+  padding: 10px;
+  border-radius: 10px;
+  text-align: center;
+}
+
+.logout-box a {
+  color: white;
+  text-decoration: none;
+}
+
+/* MAIN */
+.main {
+  margin-left: 260px;
+  padding: 10px 30px;
+  width: 100%;
+}
+
+/* STRIPS */
+.price-strip, .ai-strip {
+  margin-top: 15px;
+  padding: 12px 15px;
+  background: #ffffff;
+  border-radius: 8px;
+}
+
+.price-strip span {
+  margin-right: 25px;
+  font-weight: 500;
+}
+
+.ai-strip {
+  border-left: 5px solid #0d6b5c;
+}
+
+/* CHARTS */
+.charts {
+  display: flex;
+  gap: 25px;
+  margin-top: 25px;
+  flex-wrap: wrap;
+}
+
+.chart-box {
+  flex: 1;
+  min-width: 280px;
+  background: #fff;
+  padding: 15px;
+  border-radius: 10px;
+}
+
+/* FULL WIDTH */
+.full-width {
+  width: 100%;
+  margin-top: 20px;
+}
+
+/* LISTINGS */
+.cards-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 20px;
+  margin-top: 20px;
+}
+
+.card {
+  background: white;
+  padding: 15px;
+  border-radius: 10px;
+}
+
+.card button {
+  margin-top: 10px;
+  padding: 8px 12px;
+  border: none;
+  background: #0d6b5c;
+  color: white;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+/* VIEW ALL */
+.view-all {
+  margin-top: 15px;
+}
+.view-all a {
+  text-decoration: none;
+  color: #0d6b5c;
+  font-weight: bold;
+}
+.buyer-charts {
+  display: grid;
+  grid-template-columns: 1.2fr 1.2fr 0.8fr;
+  gap: 20px;
+  margin-top: 25px;
+  align-items: stretch;
+}
+
+.buyer-chart-box {
+  background: #fff;
+  padding: 15px;
+  border-radius: 10px;
+
+  /*  IMPORTANT FIX */
+  min-height: 320px;   /* allow flexible height */
+  
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+}
+
+.buyer-chart-box canvas {
+  width: 100% !important;
+  height: 180px !important;
+}
+.price-card {
+  background: #f8fffd;
+  border-left: 5px solid #0d6b5c;
+  padding: 12px 15px;
+  border-radius: 8px;
+  margin-top: 15px;
+  background: linear-gradient(135deg, #f0fffb, #e6f7f3);
+  box-shadow: 0 6px 18px rgba(0,0,0,0.06);
+
+  transition: 0.3s;
+}
+
+.price-title {
+  margin: 0;
+  font-size: 13px;
+  color: #666;
+}
+
+.price-values {
+  display: flex;
+  gap: 20px;
+  margin-top: 8px;
+  font-weight: 500;
+  font-size: 14px;
+}
+.ai-card {
+  margin-top: 15px;
+  padding: 18px;
+  border-radius: 12px;
+
+  background: linear-gradient(135deg, #f0fffb, #e6f7f3);
+  box-shadow: 0 6px 18px rgba(0,0,0,0.06);
+  border-left: 5px solid #0d6b5c;
+  transition: 0.3s;
+}
+
+.ai-card:hover {
+  transform: translateY(-2px);
+}
+
+.ai-header {
+  font-size: 15px;
+  font-weight: 600;
+  color: #0d6b5c;
+  margin-bottom: 10px;
+}
+
+.ai-content {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.ai-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  color: #444;
+}
+.chart-card {
+  background: #ffffff;
+  padding: 15px;
+  border-radius: 12px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.chart-card h4 {
+  margin-bottom: 10px;
+}
+
+.market-status {
+  margin-top: 20px;
+  margin-left: 10px;
+  padding: 10px;
+  text-align: center;
+  width: 100%;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+/* COLOR STATES */
+.status.high {
+  color: #e53935;   /* red */
+}
+
+.status.low {
+  color: #fb8c00;   /* orange */
+}
+
+.status.balanced {
+  color: #43a047;   /* green */
+}
+.chart-info {
+  margin-top: 19px;
+  padding: 6px 10px;
+  font-size: 13px;
+  color: #555;
+  background: #f8f9fa;
+  border-left: 3px solid #4fc3f7;
+  border-radius: 6px;
+  text-align: center;
+}
+.modal {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.4);
+  justify-content: center;
+  align-items: center;
+  z-index: 999;
+}
+
+.modal-content {
+  background: white;
+  padding: 50spx;
+  border-radius: 15px;
+  text-align: center;
+  width: 250px;
+  animation: popup 0.3s ease;
+}
+
+.checkmark {
+  font-size: 50px;
+  color: #4CAF50;
+  margin-bottom: 10px;
+}
+
+@keyframes popup {
+  from {
+    transform: scale(0.7);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+/* PREMIUM MODAL */
+.premium-modal {
+  width: 420px;
+  max-height: 80vh;
+  overflow-y: auto;
+  padding: 25px;
+  border-radius: 18px;
+  text-align: left;
+}
+
+/* SCROLL INSIDE MODAL */
+.premium-modal::-webkit-scrollbar {
+  width: 6px;
+}
+.premium-modal::-webkit-scrollbar-thumb {
+  background: #0d6b5c;
+  border-radius: 10px;
+}
+
+/* MODAL CARDS */
+.modal-card {
+  background: #f8fffd;
+  border-left: 4px solid #0d6b5c;
+  padding: 20px;
+  border-radius: 10px;
+  margin-bottom: 12px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+}
+
+/* SPACING FIX */
+.modal-card + .modal-card {
+  margin-top: 10px;
+}
+/* HEADER FIX */
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 15px;
+  padding-bottom: 10px;
+}
+
+.modal-header h3 {
+  margin: 0;
+  font-size: 18px;
+}
+
+/* FIX CLOSE BUTTON */
+.close-btn {
+  cursor: pointer;
+  font-size: 22px;
+  font-weight: bold;
+  color: #333;
+}
+
+.close-btn:hover {
+  color: #e53935;
+}
+</style>
+</head>
+
+<body>
+
+<!-- SIDEBAR -->
+<div class="sidebar">
+  <div class="sidebar-top">
+    <h2>⚡ GreenGridX</h2>
+   <a href="#" onclick="showDashboard()">🏠 Dashboard</a>
+<a href="/marketplace">⚡ Marketplace</a>
+<a href="#" onclick="showPurchases()">💳 My Purchases</a>
+<a href="#" onclick="showCarbon()">🌱 Carbon Credits</a>
+  </div>
+
+  <div class="logout-box">
+    <a href="/logout">🚪 Logout</a>
+  </div>
+</div>
+
+<!-- MAIN -->
+<div class="main">
+
+  <!-- HEADER -->
+  <h1>Welcome 👋</h1>
+  <p>Find and buy energy smartly</p>
+
+
+  <!-- PRICE STRIP -->
+  <div class="price-card">
+  <p class="price-title">📊 Current Market Prices (₹ / kWh)</p>
+
+  <div class="price-values">
+    <span>💰 Avg: ₹ <%= avgPrice %></span>
+    <span>🟢 Lowest: ₹ <%= minPrice %></span>
+    <span>🔴 Highest: ₹ <%= maxPrice %></span>
+  </div>
+</div>
+
+  <!-- AI STRIP -->
+  <div class="ai-card">
+  <div class="ai-header">
+    <span>🤖 AI Insights</span>
+  </div>
+
+  <div class="ai-content">
+    <div class="ai-item">
+      <span>🟢</span>
+      <p>Best time to buy: <b><%= bestTime %></b></p>
+    </div>
+
+    <div class="ai-item">
+      <span>💰</span>
+      <p>Lowest price:<b> ₹ <%= minPrice %></b></p>
+    </div>
+
+    <div class="ai-item">
+      <span>⚡</span>
+      <p><b><%=suggestion%></b></p>
+    </div>
+  </div>
+</div>
+<% const noData = energies.length === 0; %>
+  <!-- CHARTS -->
+  <div class="buyer-charts">
+
+  <div class="buyer-chart-box">
+    <h4>📊 Price Distribution</h4>
+    <canvas id="priceChart"></canvas>
+    <div class="chart-info">
+  <% if (noData) { %>
+    ⚠ No listings available yet
+  <% } else { %>
+    📊 Shows how many listings fall into each price range (₹ per kWh)
+  <% } %>
+</div>
+  </div>
+
+ <div class="buyer-chart-box chart-card">
+
+  <h4>📊 Demand vs Supply</h4>
+
+  <!-- CHART -->
+  <canvas id="marketChart"></canvas>
+
+  <!-- STATUS MESSAGE -->
+  <div class="market-status">
+    <% if (totalDemand > totalSupply) { %>
+      <span class="status high">⚠ Demand is higher → Prices may increase</span>
+    <% } else if (totalSupply > totalDemand) { %>
+      <span class="status low">📉 Supply is higher → Prices may drop</span>
+    <% } else { %>
+      <span class="status balanced">✅ Market is balanced</span>
+    <% } %>
+  </div>
+</div>
+  
+
+  <div class="buyer-chart-box">
+    <h4>🍩 Energy by Time</h4>
+    <canvas id="timeChart"></canvas>
+    <div class="chart-info">
+  <% if (noData) { %>
+    ⚠ No energy listings available for time analysis
+  <% } else { %>
+    📊 Shows distribution of energy across time slots
+  <% } %>
+</div>
+  </div>
+
+ 
+</div>
+
+  <!-- LISTINGS -->
+  <h2 style="margin-top:30px;">⚡ Featured Listings</h2>
+
+  <div class="cards-container">
+    <% energies.slice(0,4).forEach(item => { %>
+      <div class="card">
+        <p><b>Energy:</b> <%= item.energyAmount %> kWh</p>
+        <p><b>Price:</b> ₹ <%= item.price %></p>
+        <p><b>Location:</b> <%= item.location %></p>
+        <p><b>Time:</b> <%= item.time %></p>
+        <button onclick="buyEnergy('<%= item._id %>', this)">Buy Now</button>
+      </div>
+    <% }) %>
+  </div>
+
+  <div class="view-all">
+    <a href="/marketplace">→ View All Listings</a>
+  </div>
+
+</div>
+<div id="successModal" class="modal">
+  <div class="modal-content">
+    <div class="checkmark">✔</div>
+    <p>Purchase Successful</p>
+  </div>
+</div>
+<!-- UNIVERSAL MODAL -->
+<div id="modal" class="modal">
+  <div class="modal-content premium-modal">
+
+  <!-- HEADER -->
+  
+
+  <!-- BODY -->
+  <div id="modal-body"></div>
+
+</div>
+</div>
+<!-- JS -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+
+// ===================== 📊 PRICE DISTRIBUTION =====================
+const prices = <%= JSON.stringify(prices || []) %>;
+
+let ranges = {
+  '5-6': 0,
+  '6-7': 0,
+  '7-8': 0,
+  '8+': 0
+};
+
+// group prices
+prices.forEach(p => {
+  if (p >= 5 && p < 6) ranges['5-6']++;
+  else if (p >= 6 && p < 7) ranges['6-7']++;
+  else if (p >= 7 && p < 8) ranges['7-8']++;
+  else if (p >= 8) ranges['8+']++;
+});
+
+new Chart(document.getElementById("priceChart"), {
+  type: 'bar',
+  data: {
+    labels: Object.keys(ranges),
+    datasets: [{
+      label: 'Listings',
+      data: Object.values(ranges),
+      backgroundColor: '#a569bd'
+    }]
+  },
+  options: {
+    responsive: true,
+    maintainAspectRatio: true,
+    plugins: {
+      legend: { display: false }
+    },
+    scales: {
+      x: {
+        title: {
+          display: true,
+          text: "Price Range (₹ per kWh)"
+        }
+      },
+      y: {
+        beginAtZero: true,
+        ticks: {
+          precision: 0
+        },
+        title: {
+          display: true,
+          text: "Number of Listings"
+        }
+      }
+    }
+  }
+});
+
+
+// ===================== 🍩 ENERGY BY TIME =====================
+new Chart(document.getElementById("timeChart"), {
+  type: 'doughnut',
+  data: {
+    labels: ['Morning', 'Afternoon', 'Evening'],
+    datasets: [{
+      data: [
+        <%= morning || 0 %>,
+        <%= afternoon || 0 %>,
+        <%= evening || 0 %>
+      ],
+      backgroundColor: [
+        '#42a5f5',
+        '#ffca28',
+        '#66bb6a'
+      ]
+    }]
+  },
+  options: {
+    responsive: true,
+    maintainAspectRatio: true,
+    plugins: {
+      legend: {
+        position: 'bottom'
+      }
+    }
+  }
+});
+
+
+// ===================== 📈 DEMAND vs SUPPLY =====================
+const supply = <%= totalSupply || 0 %>;
+const demand = <%= totalDemand || 0 %>;
+
+new Chart(document.getElementById("marketChart"), {
+  type: 'bar',
+  data: {
+    labels: ['Supply', 'Demand'],
+    datasets: [{
+      label: "Energy (kWh)",
+      data: [
+        <%= totalSupply || 0 %>,
+        <%= totalDemand || 0 %>
+      ],
+      backgroundColor: ['#58d68d', '#f5b041']
+    }]
+  },
+  options: {
+    responsive: true,
+    plugins: {
+      legend: { display: false },
+      title: {
+        display: true,
+        text: "Supply vs Demand (kWh)"
+      }
+    },
+    scales: {
+      x: {
+        title: {
+          display: true,
+          text: "Market"
+        }
+      },
+      y: {
+        beginAtZero: true,
+        title: {
+          display: true,
+          text: "Energy (kWh)"
+        },
+        ticks: {
+          precision: 0
+        }
+      }
+    }
+  }
+});
+
+function buyEnergy(id, btn) {
+
+  btn.disabled = true;
+  btn.innerText = "Processing...";
+
+  fetch("/buy/" + id)
+    .then(() => {
+
+      const card = btn.closest(".card");
+      card.style.opacity = "0.5";
+
+      setTimeout(() => {
+        card.remove();
+      }, 300);
+
+      const modal = document.getElementById("successModal");
+      modal.style.display = "flex";
+
+      setTimeout(() => {
+        window.location.href = "/buyer-dashboard?refresh=" + new Date().getTime();
+      }, 1500);
+
+    });
+}
+</script>
+<script>
+
+/* OPEN/CLOSE MODAL */
+function openModal(content){
+  document.getElementById("modal").style.display = "flex";
+  document.getElementById("modal-body").innerHTML = content;
+}
+
+function closeModal(){
+  document.getElementById("modal").style.display = "none";
+}
+
+/* ================= DASHBOARD ================= */
+function showDashboard(){
+  openModal(`
+    <div class="modal-header">
+    <h3 id="modal-title">📊 Dashboard Summary</h3>
+    <span class="close-btn" onclick="closeModal()">&times;</span>
+  </div>
+
+    <div class="modal-card">⚡ Total Supply: <b><%= totalSupply %> kWh</b></div>
+    <div class="modal-card">📊 Total Demand: <b><%= totalDemand %> kWh</b></div>
+    <div class="modal-card">💰 Avg Price: <b>₹ <%= avgPrice %></b></div>
+    <div class="modal-card">🧠 Best Time: <b><%= bestTime %></b></div>
+  `);
+}
+
+/* ================= PURCHASES ================= */
+function showPurchases(){
+ let html = `
+    <div class="modal-header">
+      <h3>💳 My Purchases</h3>
+      <span class="close-btn" onclick="closeModal()">&times;</span>
+    </div>
+  `;
+  <% if(transactions && transactions.length > 0){ %>
+
+    <% transactions.forEach(t => { %>
+      html += `
+        <div class="modal-card">
+          ⚡ <b><%= t.energyPurchased %> kWh</b><br>
+          💰 ₹ <%= t.totalPrice %><br>
+          📅 <%= new Date(t.date).toLocaleDateString() %>
+        </div>
+      `;
+    <% }) %>
+
+  <% } else { %>
+
+    html += `<p>No purchases yet ⚡</p>`;
+
+  <% } %>
+
+  openModal(html);
+}
+
+/* ================= CARBON ================= */
+function showCarbon(){
+
+  const carbon = <%= (totalDemand * 0.92).toFixed(2) %>;
+
+  openModal(`
+     <div class="modal-header">
+    <h3 id="modal-title"> 🌱 Carbon Credits</h3>
+    <span class="close-btn" onclick="closeModal()">&times;</span>
+  </div>
+
+    <div class="modal-card">
+      🌍 CO₂ Saved: <b>${carbon} kg</b>
+    </div>
+
+    <div class="modal-card">
+      🪴 Equivalent to planting ~ <b>${Math.floor(carbon / 20)} trees</b>
+    </div>
+
+    <div class="modal-card">
+      ⚡ You are supporting clean energy usage
+    </div>
+  `);
+}
+
+</script>
+</body>
+</html>

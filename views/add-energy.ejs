@@ -1,0 +1,30 @@
+<h2>Add Energy Listing ⚡</h2>
+
+<form action="/add-energy" method="POST">
+
+  Energy Amount (kWh):
+  <input type="number" name="energyAmount" required><br><br>
+
+Price per kWh:
+<input type="number" name="price" step="1" required><br><br>
+
+  Location:
+  <input type="text" name="location" required><br><br>
+
+  Time:
+  <input type="text" name="time" placeholder="e.g. Evening" required><br><br>
+
+  <button type="submit">Add Listing</button>
+
+</form>
+
+<h3>AI Pricing Insights 🤖</h3>
+
+<p>
+Predicted Demand at <%= selectedTime.charAt(0).toUpperCase() + selectedTime.slice(1) %>:
+<strong><%= predictedDemand.toFixed(2) %> kWh 🌆</strong>
+</p>
+
+<p>
+Recommended Price: ₹<%= recommendedPrice %> / kWh ⚡
+</p>
