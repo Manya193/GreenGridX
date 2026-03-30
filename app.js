@@ -97,27 +97,31 @@ app.post("/register", async (req, res) => {
 
 
 app.post("/login", async (req, res) => {
+  try {
+    const user = await User.findOne({ email: req.body.email });
 
-  const user = await User.findOne({ email: req.body.email });
+    if (!user) {
+      return res.redirect("/?error=Invalid credentials");
+    }
 
-  if (!user) {
-  return res.redirect("/?error=Invalid credentials");
+    const isMatch = await bcrypt.compare(req.body.password, user.password);
+
+    if (!isMatch) {
+      return res.redirect("/?error=Invalid credentials");
+    }
+
+    req.session.userId = user._id;
+
+    if (user.role === "producer") {
+      return res.redirect("/producer-dashboard");
+    } else {
+      return res.redirect("/buyer-dashboard");
+    }
+
+  } catch (err) {
+    console.log("LOGIN ERROR:", err);   //  THIS WILL SHOW REAL ERROR
+    return res.send("Something went wrong");
   }
-
-  const isMatch = await bcrypt.compare(req.body.password, user.password);
-
-  if (!isMatch) {
-    return res.redirect("/?error=Invalid credentials");
-  }
-
-  req.session.userId=user._id;
-
-  if (user.role === "producer") {
-    return res.redirect("/producer-dashboard");
-  } else {
-    return res.redirect("/buyer-dashboard");
-  }
-
 });
 app.get("/producer-dashboard", async (req, res) => {
 
