@@ -12,6 +12,7 @@ app.set("view engine", "ejs");
 app.use(express.static("public"));
 
 //  MongoDB Atlas Connection
+console.log("MONGO_URI:", process.env.MONGO_URI);  // 👈 ADD THIS
 mongoose.connect(process.env.MONGO_URI)
 .then(() => console.log("MongoDB Atlas Connected "))
 .catch(err => console.log(err));
